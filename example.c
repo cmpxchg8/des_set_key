@@ -25,8 +25,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <windows.h>
-
 #include <openssl/des.h>
      
 void dump_hash (const char str[], uint8_t hash[]) 
