@@ -78,14 +78,6 @@ i_eight     equ key_indexes+4*7
 
 .code
 
-public DllMain
-
-DllMain PROC stdcall uses esi edi ebx hModule:DWORD, 
-    ul_reason_for_call:DWORD, lpReserved:DWORD
-    mov  eax, 1
-    ret
-DllMain ENDP
-
 public init_subkeys
 public _init_subkeys
 
@@ -181,19 +173,19 @@ sse2_DES_set_key proc C uses esi ebx edi ebp key:dword, ks:dword
       por  xmm7, [edx+16*7]
     endm
 
-    movdqa  [esi+16*0], xmm0
-    movdqa  [edi+16*0], xmm4
+    movdqu  [esi+16*0], xmm0
+    movdqu  [edi+16*0], xmm4
 
-    movdqa  [esi+16*1], xmm1
-    movdqa  [edi+16*1], xmm5
+    movdqu  [esi+16*1], xmm1
+    movdqu  [edi+16*1], xmm5
 
-    movdqa  [esi+16*2], xmm2
-    movdqa  [edi+16*2], xmm6
+    movdqu  [esi+16*2], xmm2
+    movdqu  [edi+16*2], xmm6
 
-    movdqa  [esi+16*3], xmm3
-    movdqa  [edi+16*3], xmm7
+    movdqu  [esi+16*3], xmm3
+    movdqu  [edi+16*3], xmm7
     
     ret
 sse2_DES_set_key endp
 
-    end DllMain
+    end
