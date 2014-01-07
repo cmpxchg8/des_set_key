@@ -28,14 +28,7 @@
 #include <windows.h>
 
 #include <openssl/des.h>
-
-typedef int (__cdecl *fn_init_subkeys) (void);
-typedef int (__cdecl *fn_sse2_DES_set_key) (DES_cblock *key, DES_key_schedule *ks);
-
-void *lib;
-fn_init_subkeys init_subkeys;
-fn_sse2_DES_set_key sse2_DES_set_key;
-         
+     
 void dump_hash (const char str[], uint8_t hash[]) 
 {      
   uint8_t *p;
@@ -43,20 +36,6 @@ void dump_hash (const char str[], uint8_t hash[])
   for (p = hash; (p - hash) < 8; p++) {
     printf ("%.2X",*p);
   }
-}
-
-int load_lib (void)
-{
-  if ((lib = LoadLibrary ("pc_des_set_key")) == 0) {
-    return 0;
-  }
-  if ((sse2_DES_set_key = (void*)GetProcAddress (lib, "sse2_DES_set_key")) == 0) {
-    return 0;
-  }
-  if ((init_subkeys = (void*) GetProcAddress (lib, "init_subkeys")) == 0) {
-    return 0;
-  }
-  return 1;
 }
 
 int main (int argc, char *argv[])
@@ -71,10 +50,6 @@ int main (int argc, char *argv[])
   puts ("\n  Precomputed DES Key Schedules"
         "\n  Copyright (c) 2006, 2008 Kevin Devine\n");
         
-  if (!load_lib ()) {
-    printf ("\n  Error loading pc_des_set_key.dll");
-    return 0;
-  }
   srand (time(0));
   
   /* set key data */
@@ -87,13 +62,13 @@ int main (int argc, char *argv[])
 
   /* use the regular DES_set_key function first */
   DES_set_key ((DES_cblock*)&test_key, &ks1);
-  DES_ecb_encrypt ((DES_cblock*)&plaintext, &hash1, &ks1);
+  DES_ecb_encrypt ((DES_cblock*)&plaintext, &hash1, &ks1, DES_ENCRYPT);
   dump_hash ("DES_set_key()", hash1);
 
   /* now use the routine with precomputed schedules */
   init_subkeys ();  // only required once
   sse2_DES_set_key ((DES_cblock*)&test_key, &ks2);
-  DES_ecb_encrypt ((DES_cblock*)&plaintext, &hash2, &ks2);
+  DES_ecb_encrypt ((DES_cblock*)&plaintext, &hash2, &ks2, DES_ENCRYPT);
   dump_hash ("sse2_DES_set_key()", hash2);
 
   printf ("\n\n  Results %s match.\n", 
